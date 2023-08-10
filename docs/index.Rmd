@@ -1,0 +1,291 @@
+---
+title: "Elected Representatives - Analysis"
+author: "Melvin"
+date: "2023-08-04"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+    toc_depth: 5
+  pdf_document:
+    toc: yes
+    toc_depth: '5'
+  editor_options:
+    chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F)
+knitr::opts_chunk$set(tidy = T)
+knitr::opts_chunk$set(warning = F)
+knitr::opts_chunk$set(message = F)
+knitr::opts_chunk$set(fig.height = 6)
+knitr::opts_chunk$set(fig.width =  8)
+
+source("base_cm_new.R")
+```
+
+## CM Analysis
+
+### Information about the Dataset
+
+__List of states in the dataset__
+
+```{r}
+df_party %>% select(-c(date_between,inc_states:total_valid_states)) %>% names()
+```
+
+__Years covered in the dataset__
+
+```{r}
+df_party %>% summarise(`Minimum Year` = min(year(date_between)), `Maximum Year` = max(year(date_between)))
+```
+
+### Comparative Analysis
+
+This section will compare the trajectory of INC and BJP at states since 1952.
+
+#### Political Dominance {.tabset}
+
+##### Count of CMs
+
+```{r cm-count}
+df_party %>%
+  ggplot() +
+  geom_line(aes(date_between, inc_states, color = "INC", group = 1), alpha = 0.5) +
+  geom_smooth(aes(date_between, inc_states, color = "INC", group = 1), se = F, method = loess) +
+  geom_line(aes(date_between, bjp_states, color = "BJP", group = 1), alpha = 0.5) +
+  geom_smooth(aes(date_between, bjp_states, color = "BJP", group = 1), se = F, method = loess) +
+  theme_bw() +
+  scale_x_date(breaks = "5 years", date_labels = "%Y") +
+  labs(x = "Year", y = "INC & BJP CMs (n)") +
+  scale_color_manual(values = c(INC = "#1f77b4", BJP = "#ff7f0e"),
+                     labels = c(INC = "INC", BJP = "BJP"),
+                     name = "Party") +
+  theme(legend.position = "top",
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
+
+##### Percentage of CMs
+
+```{r cm-perc}
+df_party %>%
+  ggplot() +
+  geom_line(aes(date_between, inc_states*100/total_valid_states, color = "INC", group = 1), 
+            alpha = 0.5) +
+  geom_smooth(aes(date_between, inc_states*100/total_valid_states, color = "INC", group = 1), 
+              se = F, method = loess) +
+  geom_line(aes(date_between, bjp_states*100/total_valid_states, color = "BJP", group = 1), 
+            alpha = 0.5) +
+  geom_smooth(aes(date_between, bjp_states*100/total_valid_states, color = "BJP", group = 1), 
+              se = F, method = loess) +
+  theme_bw() +
+  scale_x_date(breaks = "5 years", date_labels = "%Y") +
+  scale_y_continuous(limits = c(0,100), breaks = c(0,25,50,75,100)) +
+  labs(x = "Year", y = "INC & BJP CMs (%)") +
+  scale_color_manual(values = c(INC = "#1f77b4", BJP = "#ff7f0e"),
+                     labels = c(INC = "INC", BJP = "BJP"),
+                     name = "Party") +
+  theme(legend.position = "top",
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
+
+##### Population under CMs
+
+```{r cm-pop}
+df_party_pop %>%
+  ggplot() +
+  geom_line(aes(date_between, pop_inc, color = "INC", group = 1), 
+            alpha = 0.5) +
+  geom_line(aes(date_between, pop_bjp, color = "BJP", group = 1), 
+              alpha = 0.5) +
+  geom_smooth(aes(date_between, pop_inc, color = "INC", group = 1), 
+              se = F, method = loess) +
+  geom_smooth(aes(date_between, pop_bjp, color = "BJP", group = 1), 
+              se = F, method = loess) +
+  theme_bw() +
+  scale_x_date(breaks = "5 years", date_labels = "%Y") +
+  scale_y_continuous(limits = c(0,100), breaks = c(0,25,50,75,100)) +
+  labs(x = "Year", y = "Population under INC & BJP CMs (%)") +
+  scale_color_manual(values = c(INC = "#1f77b4", BJP = "#ff7f0e"),
+                     labels = c(INC = "INC", 
+                                BJP = "BJP"),
+                     name = "Party") +
+  theme(legend.position = "top",
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
+
+##### Mean Tenure
+
+```{r cm-tenure}
+df_party_tenure %>%
+  ggplot() +
+  geom_line(aes(date_between, tenure_inc, color = "INC", group = 1), 
+            alpha = 0.5) +
+  geom_line(aes(date_between, tenure_bjp, color = "BJP", group = 1), 
+            alpha = 0.5) +
+  geom_smooth(aes(date_between, tenure_inc, color = "INC", group = 1), 
+              se = F, method = loess) +
+  geom_smooth(aes(date_between, tenure_bjp, color = "BJP", group = 1), 
+              se = F, method = loess) +
+  theme_bw() +
+  scale_x_date(breaks = "5 years", date_labels = "%Y") +
+  labs(x = "Year", y = "Mean Tenure Duration of INC & BJP CMs") +
+  scale_color_manual(values = c(INC = "#1f77b4", BJP = "#ff7f0e"),
+                     labels = c(INC = "INC", 
+                                BJP = "BJP"),
+                     name = "Party") +
+  theme(legend.position = "top",
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
+
+##### Tenure - Boxplots
+
+```{r cm-tenure-bxplt}
+df_final %>% 
+  select(-date_between) %>% 
+  distinct(state_name,name,party, .keep_all = T) %>%
+  filter(party %in% c("INC", "BJP")) %>% 
+  ggplot(aes(party, total_tenure, fill = party)) +
+  geom_boxplot() +
+  theme_bw() +
+  labs(x = "Party", y = "Tenure Duration") +
+  scale_fill_manual(values = c(INC = "#1f77b4", BJP = "#ff7f0e"),
+                     labels = c(INC = "INC", 
+                                BJP = "BJP"),
+                     name = "Party") +
+  theme(legend.position = "top")
+```
+
+#### Social Background {.tabset}
+
+__Simple Count of CMs__
+
+```{r cm-soc-count-1}
+df_final %>% 
+  select(-date_between,) %>%
+  distinct(unique_id, .keep_all = T) %>%
+  filter(party %in% c("INC","BJP") & category_new != "PR") %>%
+  count(party, category_new) %>% 
+  mutate(category_new = factor(category_new,
+                               levels = c("GEN","OBC","SC","ST","MUSLIM","CHRISTIAN","N/A"))) %>%
+  arrange(category_new) %>% 
+  pivot_wider(names_from = category_new, values_from = n, values_fill = 0)
+```
+
+__Unique Count of CMs__
+
+```{r cm-soc-count-2}
+df_final %>% 
+  select(-date_between,) %>%
+  distinct(name, .keep_all = T) %>%
+  filter(party %in% c("INC","BJP") & category_new != "PR") %>%
+  count(party, category_new) %>% 
+  mutate(category_new = factor(category_new,
+                               levels = c("GEN","OBC","SC","ST","MUSLIM","CHRISTIAN","N/A"))) %>%
+  arrange(category_new) %>% 
+  pivot_wider(names_from = category_new, values_from = n, values_fill = 0)
+```
+
+##### Simple Proportion
+
+```{r cm-soc-prop-1}
+df_final %>% 
+  select(-date_between,) %>%
+  distinct(unique_id, .keep_all = T) %>%
+  filter(party %in% c("INC","BJP") & category_new != "PR") %>%
+  count(party, category_new) %>% 
+  mutate(category_new = factor(category_new,
+                               levels = c("GEN","OBC","SC","ST","MUSLIM","CHRISTIAN","N/A"))) %>% 
+  group_by(party) %>% 
+  mutate(s_prop = n*100/sum(n)) %>% 
+  ungroup() %>% 
+  ggplot() +
+  geom_col(aes(category_new, s_prop, fill = party), position = "dodge") +
+  theme_bw() +
+  labs(x = "Social Identity", y = "Percentage (%)") +
+  scale_fill_manual(values = c(INC = "#1f77b4", BJP = "#ff7f0e"),
+                     labels = c(INC = "INC", 
+                                BJP = "BJP"),
+                     name = "Party") +
+  theme(legend.position = "top")
+```
+
+##### Unique Proportion
+
+```{r cm-soc-prop2}
+df_final %>% 
+  select(-date_between,) %>%
+  distinct(name, .keep_all = T) %>%
+  filter(party %in% c("INC","BJP") & category_new != "PR") %>%
+  count(party, category_new) %>% 
+  mutate(category_new = factor(category_new,
+                               levels = c("GEN","OBC","SC","ST","MUSLIM","CHRISTIAN","N/A"))) %>% 
+  group_by(party) %>% 
+  mutate(s_prop = n*100/sum(n)) %>% 
+  ungroup() %>% 
+  ggplot() +
+  geom_col(aes(category_new, s_prop, fill = party), position = "dodge") +
+  theme_bw() +
+  labs(x = "Social Identity", y = "Percentage (%)") +
+  scale_fill_manual(values = c(INC = "#1f77b4", BJP = "#ff7f0e"),
+                     labels = c(INC = "INC", 
+                                BJP = "BJP"),
+                     name = "Party") +
+  theme(legend.position = "top")
+```
+
+##### INC CMs Caste
+
+```{r inc-soc}
+df_party_cat %>% 
+  ggplot() +
+  geom_smooth(aes(date_between, gen_states_inc*100/inc_states, color = "GEN"), 
+              se = F, method = loess) +
+  geom_smooth(aes(date_between, obc_states_inc*100/inc_states, color = "OBC"),
+              se = F, method = loess) +
+  geom_smooth(aes(date_between, sc_states_inc*100/inc_states, color = "SC"), 
+              se = F, method = loess) +
+  geom_smooth(aes(date_between, st_states_inc*100/inc_states, color = "ST"), 
+              se = F, method = loess) +
+  theme_bw() +
+  labs(x = "Year", y = "INC CMs - Caste Groups (%)") +
+  scale_x_date(breaks = "5 years", date_labels = "%Y") +
+  scale_y_continuous(limits = c(0,100), breaks = c(0,25,50,75,100)) +
+  scale_color_manual(values = c(GEN = "#1f77b4", OBC = "#ff7f0e",
+                                SC = "#17becf", ST = "#2ca02c"),
+                     labels = c(GEN = "GEN", OBC = "OBC", 
+                                SC = "SC", ST = "ST"),
+                     name = "Caste Group") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+        legend.position = "top")
+```
+
+##### BJP CMs Caste
+
+```{r bjp-soc}
+df_party_cat %>% 
+  ggplot() +
+  geom_smooth(aes(date_between, gen_states_bjp*100/bjp_states, color = "GEN"), 
+              se = F, method = loess) +
+  geom_smooth(aes(date_between, obc_states_bjp*100/bjp_states, color = "OBC"),
+              se = F, method = loess) +
+  geom_smooth(aes(date_between, sc_states_bjp*100/bjp_states, color = "SC"), 
+              se = F, method = loess) +
+  geom_smooth(aes(date_between, st_states_bjp*100/bjp_states, color = "ST"), 
+              se = F, method = loess) +
+  theme_bw() +
+  labs(x = "Year", y = "BJP CMs - Caste Groups (%)") +
+  scale_x_date(breaks = "5 years", date_labels = "%Y") +
+  scale_y_continuous(limits = c(0,100), breaks = c(0,25,50,75,100)) +
+  scale_color_manual(values = c(GEN = "#1f77b4", OBC = "#ff7f0e",
+                                SC = "#17becf", ST = "#2ca02c"),
+                     labels = c(GEN = "GEN", OBC = "OBC", 
+                                SC = "SC", ST = "ST"),
+                     name = "Caste") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+        legend.position = "top")
+```
+
+## MP Analysis
+
