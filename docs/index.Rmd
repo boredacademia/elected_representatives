@@ -282,7 +282,7 @@ df_party_cat %>%
                                 SC = "#17becf", ST = "#2ca02c"),
                      labels = c(GEN = "GEN", OBC = "OBC", 
                                 SC = "SC", ST = "ST"),
-                     name = "Caste") +
+                     name = "Caste Group") +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
         legend.position = "top")
 ```
