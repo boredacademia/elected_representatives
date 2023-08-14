@@ -376,7 +376,99 @@ df_mp %>%
         axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 ```
 
-#### Caste (n)
+#### Religion (n)
+
+```{r}
+df_mp %>% 
+ mutate(Rel_new = factor(Rel_new, levels = c("HINDU","MUSLIM","CHRISTIAN","OTHERS"))) %>% 
+  filter(Party %in% c("INC","BJP") & Position == 1) %>% 
+  count(Elec_year,Party,Rel_new) %>%
+  ggplot(aes(Elec_year, n, color = Party)) +
+  geom_point() +
+  geom_line(linewidth = 1) +
+  scale_x_continuous(limits = c(1960,2020), n.breaks = 6) +
+  theme_bw() +
+  labs(x = "Year", y = "INC & BJP MPs (n)", color = "Party") +
+  facet_wrap(~ Rel_new) +
+  scale_color_manual(values = c(INC = "#1f77b4", BJP = "#ff7f0e"),
+                     labels = c(INC = "INC", 
+                                BJP = "BJP"),
+                     name = "Party") +
+  theme(legend.position = "top",
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
+
+#### Religion (%)
+
+```{r}
+df_mp %>% 
+  mutate(Rel_new = factor(Rel_new, levels = c("HINDU","MUSLIM","CHRISTIAN","OTHERS"))) %>% 
+  filter(Party %in% c("INC","BJP") & Position == 1) %>% 
+  count(Elec_year,Party,Rel_new) %>%
+  group_by(Elec_year, Party) %>% 
+  mutate(n = round(n*100/sum(n))) %>% 
+  ggplot(aes(Elec_year, n, color = Party)) +
+  geom_point() +
+  geom_line(linewidth = 1) +
+  scale_x_continuous(limits = c(1960,2020), n.breaks = 6) +
+  theme_bw() +
+  labs(x = "Year", y = "INC & BJP MPs (%)", color = "Party") +
+  facet_wrap(~ Rel_new) +
+  scale_color_manual(values = c(INC = "#1f77b4", BJP = "#ff7f0e"),
+                     labels = c(INC = "INC", 
+                                BJP = "BJP"),
+                     name = "Party") +
+  theme(legend.position = "top",
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
+
+#### Caste-I (n)
+
+```{r}
+df_mp %>% 
+  mutate(Caste_new = factor(Caste_new, levels = c("UC","IC","OBC","SC","ST","OTHERS",NA))) %>% 
+  filter(Party %in% c("INC","BJP") & Position == 1) %>% 
+  count(Elec_year,Party,Caste_new) %>%
+  ggplot(aes(Elec_year, n, color = Party)) +
+  geom_point() +
+  geom_line(linewidth = 1) +
+  scale_x_continuous(limits = c(1960,2020), n.breaks = 6) +
+  theme_bw() +
+  labs(x = "Year", y = "INC & BJP MPs (n)", color = "Party") +
+  facet_wrap(~ Caste_new) +
+  scale_color_manual(values = c(INC = "#1f77b4", BJP = "#ff7f0e"),
+                     labels = c(INC = "INC", 
+                                BJP = "BJP"),
+                     name = "Party") +
+  theme(legend.position = "top",
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
+
+#### Caste-I (%)
+
+```{r}
+df_mp %>% 
+  mutate(Caste_new = factor(Caste_new, levels = c("UC","IC","OBC","SC","ST","OTHERS",NA))) %>% 
+  filter(Party %in% c("INC","BJP") & Position == 1) %>% 
+  count(Elec_year,Party,Caste_new) %>%
+  group_by(Elec_year, Party) %>% 
+  mutate(n = round(n*100/sum(n))) %>% 
+  ggplot(aes(Elec_year, n, color = Party)) +
+  geom_point() +
+  geom_line(linewidth = 1) +
+  scale_x_continuous(limits = c(1960,2020), n.breaks = 6) +
+  theme_bw() +
+  labs(x = "Year", y = "INC & BJP MPs (%)", color = "Party") +
+  facet_wrap(~ Caste_new) +
+  scale_color_manual(values = c(INC = "#1f77b4", BJP = "#ff7f0e"),
+                     labels = c(INC = "INC", 
+                                BJP = "BJP"),
+                     name = "Party") +
+  theme(legend.position = "top",
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
+
+#### Caste-II (n)
 
 ```{r}
 df_mp %>% 
@@ -394,7 +486,7 @@ df_mp %>%
         axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 ```
 
-#### Caste (%)
+#### Caste-II (%)
 
 ```{r}
 df_mp %>% 
