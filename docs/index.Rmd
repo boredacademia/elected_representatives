@@ -23,6 +23,7 @@ knitr::opts_chunk$set(fig.height = 6)
 knitr::opts_chunk$set(fig.width =  8)
 
 source("base_cm_new.R")
+source("base_mp.R")
 ```
 
 ## CM Analysis
@@ -289,3 +290,158 @@ df_party_cat %>%
 
 ## MP Analysis
 
+### Comparative Analysis {.tabset}
+
+#### Count of MPs
+
+```{r mp-count}
+df_mp %>% 
+  filter(Party %in% c("INC","BJP") & Position == 1) %>% 
+  count(Elec_year,Party) %>% 
+  ggplot(aes(Elec_year, n, color = Party)) +
+  geom_line(linewidth = 1) +
+  theme_bw() +
+  labs(x = "Year", y = "INC & BJP MPs (n)") +
+  scale_color_manual(values = c(INC = "#1f77b4", BJP = "#ff7f0e"),
+                     labels = c(INC = "INC", 
+                                BJP = "BJP"),
+                     name = "Party") +
+  theme(legend.position = "top",
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
+
+#### Percentage of MPs
+
+```{r mp-perc}
+df_mp %>%
+  mutate(Party = case_when(Party == "INC" ~ "INC",
+                           Party == "BJP" ~ "BJP",
+                           T ~ "Others")) %>% 
+  filter(Position == 1) %>% 
+  count(Elec_year,Party) %>%
+  group_by(Elec_year) %>% 
+  mutate(n = round(n*100/sum(n))) %>% 
+  filter(Party != "Others") %>% 
+  ggplot(aes(Elec_year, n, color = Party)) +
+  geom_line(linewidth = 1) +
+  theme_bw() +
+  labs(x = "Year", y = "INC & BJP MPs (%)") +
+  scale_color_manual(values = c(INC = "#1f77b4", BJP = "#ff7f0e"),
+                     labels = c(INC = "INC", 
+                                BJP = "BJP"),
+                     name = "Party") +
+  theme(legend.position = "top",
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
+
+#### Count of MPs (Unique)
+```{r mp-unq-count}
+df_mp %>% 
+  filter(Party %in% c("INC","BJP") & Position == 1) %>% 
+  distinct(Party,Candidate, .keep_all = T) %>% 
+  count(Elec_year,Party) %>% 
+  ggplot(aes(Elec_year, n, color = Party)) +
+  geom_line(linewidth = 1) +
+  theme_bw() +
+  labs(x = "Year", y = "INC & BJP Unique MPs (n)") +
+  scale_color_manual(values = c(INC = "#1f77b4", BJP = "#ff7f0e"),
+                     labels = c(INC = "INC", 
+                                BJP = "BJP"),
+                     name = "Party") +
+  theme(legend.position = "top",
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+
+```
+
+#### Percentage of Unique MPs
+
+```{r mp-unq-perc}
+df_mp %>%
+  distinct(Party,Candidate, .keep_all = T) %>% 
+  mutate(Party = case_when(Party == "INC" ~ "INC",
+                           Party == "BJP" ~ "BJP",
+                           T ~ "Others")) %>% 
+  filter(Position == 1) %>% 
+  count(Elec_year,Party) %>%
+  group_by(Elec_year) %>% 
+  mutate(n = round(n*100/sum(n))) %>% 
+  filter(Party != "Others") %>% 
+  ggplot(aes(Elec_year, n, color = Party)) +
+  geom_line(linewidth = 1) +
+  theme_bw() +
+  labs(x = "Year", y = "INC & BJP MPs (%)") +
+  scale_color_manual(values = c(INC = "#1f77b4", BJP = "#ff7f0e"),
+                     labels = c(INC = "INC", 
+                                BJP = "BJP"),
+                     name = "Party") +
+  theme(legend.position = "top",
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
+
+#### Gender (n)
+
+```{r mp-gender-count}
+df_mp %>% 
+  filter(Party %in% c("INC","BJP") & Position == 1) %>% 
+  count(Elec_year,Party,Sex) %>% 
+  ggplot(aes(Elec_year, n, color = Sex)) +
+  geom_line(linewidth = 1) +
+  theme_bw() +
+  labs(x = "Year", y = "INC & BJP MPs (n)") +
+  scale_color_tableau() +
+  facet_wrap(~ Party) +
+  theme(legend.position = "top",
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
+
+#### Gender (%)
+
+```{r}
+df_mp %>% 
+  filter(Party %in% c("INC","BJP") & Position == 1) %>% 
+  count(Elec_year,Party,Sex)  %>%
+  group_by(Elec_year,Party) %>% 
+  mutate(n = round(n*100/sum(n))) %>% 
+  ggplot(aes(Elec_year, n, color = Sex)) +
+  geom_line(linewidth = 1) +
+  theme_bw() +
+  labs(x = "Year", y = "INC & BJP MPs (%)") +
+  scale_color_tableau() +
+  facet_wrap(~ Party) +
+  theme(legend.position = "top",
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
+
+#### Caste (n)
+
+```{r}
+df_mp %>% 
+  filter(Party %in% c("INC","BJP") & Position == 1) %>% 
+  count(Elec_year,Party,Constituency_Type) %>% 
+  ggplot(aes(Elec_year, n, color = Constituency_Type)) +
+  geom_line(linewidth = 1) +
+  theme_bw() +
+  labs(x = "Year", y = "INC & BJP MPs (n)") +
+  scale_color_tableau() +
+  facet_wrap(~ Party) +
+  theme(legend.position = "top",
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
+
+#### Caste (%)
+
+```{r}
+df_mp %>% 
+  filter(Party %in% c("INC","BJP") & Position == 1) %>% 
+  count(Elec_year,Party,Constituency_Type) %>%
+  group_by(Elec_year,Party) %>% 
+  mutate(n = round(n*100/sum(n))) %>% 
+  ggplot(aes(Elec_year, n, color = Constituency_Type)) +
+  geom_line(linewidth = 1) +
+  theme_bw() +
+  labs(x = "Year", y = "INC & BJP MPs (%)") +
+  scale_color_tableau() +
+  facet_wrap(~ Party) +
+  theme(legend.position = "top",
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
